@@ -4,13 +4,10 @@
     <div class="col-md-6 mx-auto">
 
         <div class="card card-body bg-light mt-5">
-
+            <?php flash('register_success') ?>
             <h2>Log in</h2>
             <p>Please fill out your credentials</p>
             <form action="<?php echo URLROOT; ?>/users/login" method="POST">
-                
-                
-                
                 
                 <div class="form-group">
                     <label for="email">Email: <sup>*</sup></label>
@@ -29,7 +26,7 @@
                 
               
                 
-                
+                <?php flash('login_failed') ?>
                 
                 <div class="row">
                     <div class="col">

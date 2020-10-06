@@ -1,9 +1,12 @@
 <?php
 
 class Users extends Controller {
-
+    
+   private $userModel;
+    
     public function __construct() {
-        
+//        Creating user model
+        $this->userModel = $this->model('User');
     }
 
     public function register() {
@@ -30,24 +33,25 @@ class Users extends Controller {
 //            Validate name
             if (empty($data['name'])) {
                 $data['name_err'] = 'Please enter name';
-            } else {
-                
             }
 
             //            Validate email
             if (empty($data['email'])) {
                 $data['email_err'] = 'Please enter email';
             } else {
-                
+//                Checking if email already exists
+                if($this->userModel->findUserByEmail($data['email'])){
+                    $data['email_err'] = 'This email already exists';
+                }
             }
 
             //            Validate password
             if (empty($data['password'])) {
                 $data['password_err'] = 'Please enter password';
-            } else if (strlen($data['password']) < 6) {
-                $data['password_err'] = 'Password must be at least 6 characters';
             } else {
-                
+                if (strlen($data['password']) < 6){
+                    $data['password_err'] = 'Password must be at least 6 characters';
+                }
             }
 
             //            Validate confirm password
@@ -61,7 +65,18 @@ class Users extends Controller {
             
             if (empty($data['name_err']) && empty($data['email_err']) && empty($data['password_err']) && empty($data['confirm_password_email_err'])) {
 //                    Form Valid
-                die('Valid');
+                
+//                Hash password
+                $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+                
+//                Register user
+                if($this->userModel->register($data)){
+                    flash('register_success', 'You are registered and can now log in');
+                    redirect('users/login');
+                }
+                else{
+                    die('Something went wrong...');
+                }
             }
             else{
 //                Form Invalid,
@@ -93,6 +108,9 @@ class Users extends Controller {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 //            Process form
             
+//            Sanitize POST array
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            
             //            Get data from form, create data array
             $data = [
                 'email' => $_POST['email'],
@@ -105,20 +123,26 @@ class Users extends Controller {
 //            Validate name
             if (empty($data['email'])) {
                 $data['email_err'] = 'Please enter email';
-            } else {
-                
-            }
+            } 
 
             //            Validate email
             if (empty($data['password'])) {
                 $data['password_err'] = 'Please enter password';
-            } else {
-                
-            }
+            } 
             
             if(empty($data['email_err']) && empty($data['password_err'])){
-                
-                die('validated');
+//                Attempting log in
+                $user = $this->userModel->login($data);
+                if($user){
+//                    Log in successfull
+                    $this->createUserSession($user);
+                    redirect('pages/index');
+                }
+                else{
+//                    Failed log in
+                    flash('login_failed', 'Incorrect user email / password', 'alert alert-danger');
+                    $this->view('users/login', $data);
+                }
             }
             
             else{
@@ -138,6 +162,13 @@ class Users extends Controller {
 
 //        Load view
         $this->view('users/login', $data);
+    }
+
+//    Creating session for logged in user
+    public function createUserSession($user) {
+        $_SESSION['user_id'] = $user->id;
+        $_SESSION['user_name'] = $user->name;
+        $_SESSION['user_email'] = $user->email;
     }
 
 }

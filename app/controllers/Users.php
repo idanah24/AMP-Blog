@@ -170,5 +170,19 @@ class Users extends Controller {
         $_SESSION['user_name'] = $user->name;
         $_SESSION['user_email'] = $user->email;
     }
+    
+//    Logging out
+    public function logout(){
+        unset($_SESSION['user_id']);
+        unset($_SESSION['user_name']);
+        unset($_SESSION['user_email']);
+        session_destroy();
+        redirect('users/login');
+    }
+    
+//    Checking if there is a user connected
+    public function isLoggedIn(){
+        return isset($_SESSION['user_id']);
+    }
 
 }

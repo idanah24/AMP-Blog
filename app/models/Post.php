@@ -63,5 +63,11 @@ class Post {
         $this->db->execute();
         
     }
+    
+    public function delete($id){
+        $this->db->query('DELETE FROM  posts WHERE posts.id = :id');
+        $this->db->bind(':id', $id);
+        $this->db->execute();
+    }
 
 }

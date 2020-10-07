@@ -4,7 +4,7 @@ class Posts extends Controller {
 
     private $postModel;
     private $userModel;
-    
+
     public function __construct() {
         if (!isLoggedIn()) {
             redirect('/users/login');
@@ -72,8 +72,7 @@ class Posts extends Controller {
         }
     }
 
-    
-    public function show($id){
+    public function show($id) {
         $post = $this->postModel->getPostById($id);
         $user = $this->userModel->getUserById($post->user_id);
         $data = [
@@ -81,18 +80,16 @@ class Posts extends Controller {
             'user' => $user
         ];
         $this->view('posts/show', $data);
-        
-        
     }
-    
+
 //    Edit existing post
-    public function edit($id){
-        
-        
-        if($_SERVER['REQUEST_METHOD'] == 'GET'){
+    public function edit($id) {
+
+
+        if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 //            Editing post
             $post = $this->postModel->getPostById($id);
-            
+
             $data = [
                 'id' => $id,
                 'title' => $post->title,
@@ -100,12 +97,11 @@ class Posts extends Controller {
                 'title_err' => '',
                 'body_err' => ''
             ];
-            
+
             $this->view('posts/edit', $data);
-        }
-        else{
+        } else {
 //            Updating post
-            
+
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
 //        Get form data
@@ -126,7 +122,6 @@ class Posts extends Controller {
                 $data['body_err'] = 'Please fill in post content';
             }
 
-
 //        Checking validation
 
             if (empty($data['title_err']) && empty($data['body_err'])) {
@@ -138,10 +133,14 @@ class Posts extends Controller {
 //                $this->view('posts/edit/' . $id, $data);
                 redirect('posts/edit/' . $id);
             }
-            
-            
         }
+    }
+
+    
+//    Delete post
+    public function delete($id){
+        $this->postModel->delete($id);
+        redirect('posts');
         
     }
-    
 }

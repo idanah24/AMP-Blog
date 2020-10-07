@@ -35,5 +35,33 @@ class Post {
 
         $this->db->execute();
     }
+    
+    public function getPostById($id){
+        
+        $this->db->query('SELECT * FROM posts WHERE posts.id = :id');
+        $this->db->bind(':id', $id);
+        $post = $this->db->single();
+        
+        return $post;
+        
+    }
+    
+//    Edit existing post with new values
+    public function edit($id, $data){
+        
+        $this->db->query(
+                'UPDATE posts
+                    SET posts.title = :title, posts.body = :body, posts.created_at = :created
+                    WHERE posts.id = :id
+            ');
+        
+        $this->db->bind(':title', $data['title']);
+        $this->db->bind(':body', $data['body']);
+        $this->db->bind(':created', date('Y-m-d H:i:s', time()));
+        $this->db->bind(':id', $id);
+        
+        $this->db->execute();
+        
+    }
 
 }

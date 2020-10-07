@@ -136,7 +136,7 @@ class Users extends Controller {
                 if($user){
 //                    Log in successfull
                     $this->createUserSession($user);
-                    redirect('pages/index');
+                    redirect('posts');
                 }
                 else{
 //                    Failed log in
